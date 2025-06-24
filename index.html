@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Quiz: Body Check - What's Holding You Back?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .quiz-header {
+            margin-bottom: 30px;
+        }
+        
+        .quiz-title {
+            font-size: 2.2em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .quiz-subtitle {
+            color: #666;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        
+        .question-container {
+            margin: 30px 0;
+        }
+        
+        .question {
+            font-size: 1.4em;
+            color: #333;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 18px 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+            font-weight: 500;
+            color: #495057;
+        }
+        
+        .option:hover {
+            background: #e7f3ff;
+            border-color: #007bff;
+            transform: translateY(-2px);
+        }
+        
+        .option.selected {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007bff, #28a745);
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #007bff, #28a745);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,123,255,0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result-container {
+            text-align: left;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .result-title {
+            font-size: 1.6em;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .result-text {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+        
+        .recommendation {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+            margin: 20px 0;
+        }
+        
+        .email-container {
+            background: #fff3cd;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            border: 2px solid #ffeaa7;
+        }
+        
+        .email-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            margin: 10px 0;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .icon {
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1 class="quiz-title">🔍 Free Quiz: Body Check</h1>
+            <p class="quiz-subtitle">Discover what's holding you back from feeling your absolute best</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div id="questionContainer" class="question-container">
+            <div class="question" id="question">What's your main health priority right now?</div>
+            <div class="options" id="options">
+                <div class="option" data-category="weight">🏃‍♀️ Slim down & lose belly fat</div>
+                <div class="option" data-category="energy">⚡ Boost all-day energy</div>
+                <div class="option" data-category="digestion">🌱 Calm my digestion / microbiome</div>
+                <div class="option" data-category="joints">🦴 Keep joints comfy & flexible</div>
+                <div class="option" data-category="blood-sugar">🩸 Balance blood sugar</div>
+                <div class="option" data-category="skin">✨ Get glowing, younger-looking skin</div>
+                <div class="option" data-category="dental">🦷 Strengthen teeth & gums</div>
+            </div>
+        </div>
+        
+        <div class="hidden" id="resultContainer">
+            <div class="result-container">
+                <div class="result-title" id="resultTitle"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="recommendation" id="recommendation"></div>
+            </div>
+            
+            <div class="email-container">
+                <h3>🎁 Get Your Personalized Health Action Plan</h3>
+                <p>Enter your email to receive a detailed guide with specific tips tailored to your results (completely optional)</p>
+                <input type="email" class="email-input" id="emailInput" placeholder="Enter your email address">
+                <button class="btn" onclick="submitEmail()">Get My Action Plan</button>
+                <button class="btn" onclick="skipEmail()" style="background: #6c757d;">Skip & Continue</button>
+            </div>
+        </div>
+        
+        <button class="btn hidden" id="nextBtn" onclick="nextQuestion()">Next Question</button>
+        <button class="btn hidden" id="retakeBtn" onclick="retakeQuiz()">Take Quiz Again</button>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        let answers = {};
+        let selectedCategory = '';
+        
+        const questions = {
+            weight: [
+                {
+                    question: "What's your biggest challenge with weight management?",
+                    options: [
+                        { text: "Slow metabolism", key: "metabolism" },
+                        { text: "Stubborn belly fat", key: "belly" },
+                        { text: "Late-night cravings", key: "cravings" },
+                        { text: "Lack of energy to exercise", key: "energy" }
+                    ]
+                },
+                {
+                    question: "When do you struggle most with your eating habits?",
+                    options: [
+                        { text: "Evening/night time", key: "night" },
+                        { text: "During stressful periods", key: "stress" },
+                        { text: "When I'm bored", key: "boredom" },
+                        { text: "After meals (still hungry)", key: "satisfaction" }
+                    ]
+                }
+            ],
+            energy: [
+                {
+                    question: "When do you feel most drained during the day?",
+                    options: [
+                        { text: "Morning (hard to wake up)", key: "morning" },
+                        { text: "Afternoon crash (2-4 PM)", key: "afternoon" },
+                        { text: "Evening (no energy left)", key: "evening" },
+                        { text: "All day long", key: "constant" }
+                    ]
+                },
+                {
+                    question: "What affects your energy levels most?",
+                    options: [
+                        { text: "Poor sleep quality", key: "sleep" },
+                        { text: "Digestive issues", key: "digestion" },
+                        { text: "Stress and anxiety", key: "stress" },
+                        { text: "Blood sugar swings", key: "blood-sugar" }
+                    ]
+                }
+            ],
+            digestion: [
+                {
+                    question: "What digestive issue bothers you most?",
+                    options: [
+                        { text: "Bloating after meals", key: "bloating" },
+                        { text: "Irregular bowel movements", key: "irregular" },
+                        { text: "Stomach discomfort", key: "discomfort" },
+                        { text: "Food sensitivities", key: "sensitivities" }
+                    ]
+                },
+                {
+                    question: "How often do you experience digestive discomfort?",
+                    options: [
+                        { text: "Daily", key: "daily" },
+                        { text: "Few times per week", key: "weekly" },
+                        { text: "After certain foods", key: "specific" },
+                        { text: "During stressful times", key: "stress" }
+                    ]
+                }
+            ],
+            joints: [
+                {
+                    question: "Where do you feel joint discomfort most?",
+                    options: [
+                        { text: "Knees", key: "knees" },
+                        { text: "Back/spine", key: "back" },
+                        { text: "Hands/wrists", key: "hands" },
+                        { text: "Multiple areas", key: "multiple" }
+                    ]
+                },
+                {
+                    question: "When is your joint discomfort worst?",
+                    options: [
+                        { text: "First thing in the morning", key: "morning" },
+                        { text: "After physical activity", key: "activity" },
+                        { text: "During weather changes", key: "weather" },
+                        { text: "End of the day", key: "evening" }
+                    ]
+                }
+            ],
+            "blood-sugar": [
+                {
+                    question: "What blood sugar symptoms concern you most?",
+                    options: [
+                        { text: "Energy crashes after meals", key: "crashes" },
+                        { text: "Constant sugar cravings", key: "cravings" },
+                        { text: "Difficulty losing weight", key: "weight" },
+                        { text: "Mood swings", key: "mood" }
+                    ]
+                },
+                {
+                    question: "When do you notice these symptoms most?",
+                    options: [
+                        { text: "1-2 hours after eating", key: "post-meal" },
+                        { text: "Between meals", key: "between" },
+                        { text: "Late afternoon", key: "afternoon" },
+                        { text: "All throughout the day", key: "constant" }
+                    ]
+                }
+            ],
+            skin: [
+                {
+                    question: "What skin concern bothers you most?",
+                    options: [
+                        { text: "Signs of aging (wrinkles, fine lines)", key: "aging" },
+                        { text: "Dull, tired-looking skin", key: "dull" },
+                        { text: "Uneven skin tone", key: "uneven" },
+                        { text: "Lack of firmness", key: "firmness" }
+                    ]
+                },
+                {
+                    question: "What do you think affects your skin health most?",
+                    options: [
+                        { text: "Stress and lack of sleep", key: "stress" },
+                        { text: "Poor nutrition", key: "nutrition" },
+                        { text: "Environmental factors", key: "environment" },
+                        { text: "Natural aging process", key: "aging" }
+                    ]
+                }
+            ],
+            dental: [
+                {
+                    question: "What dental concern worries you most?",
+                    options: [
+                        { text: "Gum health and bleeding", key: "gums" },
+                        { text: "Tooth sensitivity", key: "sensitivity" },
+                        { text: "Bad breath", key: "breath" },
+                        { text: "Tooth decay/cavities", key: "decay" }
+                    ]
+                },
+                {
+                    question: "How often do you experience dental discomfort?",
+                    options: [
+                        { text: "Daily", key: "daily" },
+                        { text: "Few times per week", key: "weekly" },
+                        { text: "Occasionally", key: "occasional" },
+                        { text: "Only during dental cleanings", key: "cleanings" }
+                    ]
+                }
+            ]
+        };
+        
+        const results = {
+            weight: {
+                title: "🎯 Your Focus: Healthy Weight Management",
+                text: "Based on your answers, you're looking to optimize your metabolism and achieve sustainable weight loss. The key is addressing the root causes rather than just symptoms.",
+                recommendation: "Research shows that certain natural compounds can help boost metabolism while you sleep, reduce cravings, and support healthy fat burning. Consider exploring science-backed approaches that work with your body's natural rhythms rather than against them."
+affiliateLink: "https://3a628269m8tf9x2k89eiwir-93.hop.clickbank.net/?&traffic_type=pinterest"  // Sumatra flat belly tonic
+            },
+            energy: {
+                title: "⚡ Your Focus: Sustainable Energy Boost",
+                text: "Your energy challenges seem to stem from multiple factors including sleep quality, stress, and possibly blood sugar fluctuations. Addressing these holistically is key.",
+                recommendation: "Look into natural energy-supporting nutrients that can help stabilize your blood sugar, improve sleep quality, and provide sustained energy without crashes. A comprehensive approach addressing gut health and metabolism often yields the best results."
+affiliateLink: "https://49af38-5sz3ngm57j96fmcau3n.hop.clickbank.net/?&traffic_source=pinterest"  // Ikaria Juice
+            },
+            digestion: {
+                title: "🌱 Your Focus: Digestive Harmony",
+                text: "Your digestive system is crying out for support. A healthy gut is the foundation of overall wellness, affecting everything from immunity to mood.",
+                recommendation: "Focus on rebuilding your gut microbiome with beneficial bacteria and digestive enzymes. Research indicates that specific probiotic strains combined with prebiotic fibers can dramatically improve digestive comfort and regularity within weeks."
+affiliateLink: "https://9752867cu45q8ra8oi-i7abq02.hop.clickbank.net/?&traffic_source=pinterest"  // Mytolin
+            },
+            joints: {
+                title: "🦴 Your Focus: Joint Comfort & Mobility",
+                text: "Joint discomfort can significantly impact your quality of life. The good news is that many people find relief through natural approaches that address inflammation.",
+                recommendation: "Studies suggest that certain plant-based compounds can help reduce joint inflammation and support cartilage health. Look for research-backed ingredients that have been shown to improve joint comfort and flexibility in clinical trials."
+affiliateLink: "https://8df2b99jj-xq8m362atlw3vl4j.hop.clickbank.net/?&traffic_source=pinterest"  // Joint Genesis™
+            },
+            "blood-sugar": {
+                title: "🩸 Your Focus: Blood Sugar Balance",
+                text: "Stable blood sugar is crucial for energy, weight management, and overall health. Your symptoms suggest your body needs support in this area.",
+                recommendation: "Consider natural approaches that can help your body process glucose more effectively. Certain botanical extracts have been shown in studies to support healthy blood sugar levels and reduce energy crashes."
+affiliateLink: "https://ca88ebzkp81hfxdeytplbv3oee.hop.clickbank.net/?&traffic_source=pinterest"  // Gluco6
+            },
+            skin: {
+                title: "✨ Your Focus: Radiant, Youthful Skin",
+                text: "Your skin reflects your overall health from the inside out. True skin health starts with proper nutrition and reducing internal inflammation.",
+                recommendation: "Research shows that certain antioxidants and nutrients can help protect against free radical damage and support collagen production. A comprehensive approach addressing both internal health and external care often yields the most dramatic results."
+affiliateLink: "https://48d1dc99mw1e4t1apeu8u2nn6g.hop.clickbank.net/?&traffic_source=pinterest"  // Neotonics
+            },
+            dental: {
+                title: "🦷 Your Focus: Optimal Oral Health",
+                text: "Oral health is closely connected to overall health. Your concerns suggest your mouth's natural balance needs support.",
+                recommendation: "Studies indicate that certain probiotic strains specifically chosen for oral health can help maintain healthy gums and teeth. Look for approaches that support your mouth's natural microbiome while strengthening tooth enamel."
+        affiliateLink: "https://72ba65zdy74l2m3gyaqdwft65l.hop.clickbank.net/?&traffic_source=pinterest"  // Pr
+            }
+        };
+        
+        function updateProgress() {
+            const totalQuestions = selectedCategory ? questions[selectedCategory].length + 1 : 1;
+            const progress = ((currentQuestion + 1) / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+        
+        function selectOption(element) {
+            // Remove previous selection
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            
+            // Add selection to clicked option
+            element.classList.add('selected');
+            
+            if (currentQuestion === 0) {
+                selectedCategory = element.dataset.category;
+                document.getElementById('nextBtn').classList.remove('hidden');
+            } else {
+                const questionIndex = currentQuestion - 1;
+                const optionIndex = Array.from(element.parentNode.children).indexOf(element);
+                answers[`q${questionIndex}`] = questions[selectedCategory][questionIndex].options[optionIndex];
+                document.getElementById('nextBtn').classList.remove('hidden');
+            }
+        }
+        
+        function nextQuestion() {
+            currentQuestion++;
+            
+            if (selectedCategory && currentQuestion <= questions[selectedCategory].length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+        
+        function showQuestion() {
+            const questionContainer = document.getElementById('questionContainer');
+            const questionIndex = currentQuestion - 1;
+            const currentQuestionData = questions[selectedCategory][questionIndex];
+            
+            document.getElementById('question').textContent = currentQuestionData.question;
+            
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            currentQuestionData.options.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option.text;
+                optionDiv.onclick = () => selectOption(optionDiv);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            document.getElementById('nextBtn').classList.add('hidden');
+            updateProgress();
+            
+            questionContainer.classList.add('fade-in');
+        }
+        
+        function showResults() {
+            document.getElementById('questionContainer').classList.add('hidden');
+            document.getElementById('nextBtn').classList.add('hidden');
+            
+            const resultContainer = document.getElementById('resultContainer');
+            const result = results[selectedCategory];
+            
+            document.getElementById('resultTitle').textContent = result.title;
+            document.getElementById('resultText').textContent = result.text;
+            document.getElementById('recommendation').textContent = result.recommendation;
+            
+            resultContainer.classList.remove('hidden');
+            resultContainer.classList.add('fade-in');
+            
+            updateProgress();
+        }
+        
+        function submitEmail() {
+            const email = document.getElementById('emailInput').value;
+            if (email) {
+                // Optional: You can capture email here for your email marketing
+                console.log('Email captured:', email);
+            }
+            showFinalMessage();
+        }
+        
+        function skipEmail() {
+            showFinalMessage();
+        }
+        
+     // 1. Extindem obiectul results cu affiliateLink
+const results = {
+    weight: {
+        title: "🎯 Your Focus: Healthy Weight Management",
+        text: "Based on your answers...",
+        recommendation: "Research shows...",
+        affiliateLink: "https://3a628269m8tf9x2k89eiwir-93.hop.clickbank.net/?&traffic_type=pinterest"  // Sumatra flat belly tonic
+    },
+    energy: {
+        title: "⚡ Your Focus: Sustainable Energy Boost",
+        text: "Your energy challenges...",
+        recommendation: "Look into natural energy-supporting nutrients...",
+        affiliateLink: "https://49af38-5sz3ngm57j96fmcau3n.hop.clickbank.net/?&traffic_source=pinterest"  // Ikaria Juice
+    },
+    digestion: {
+        title: "🌱 Your Focus: Digestive Harmony",
+        text: "Your digestive system...",
+        recommendation: "Focus on rebuilding your gut microbiome...",
+        affiliateLink: "https://9752867cu45q8ra8oi-i7abq02.hop.clickbank.net/?&traffic_source=pinterest"  // Mytolin
+    },
+    joints: {
+        title: "🦴 Your Focus: Joint Comfort & Mobility",
+        text: "Joint discomfort can...",
+        recommendation: "Studies suggest that certain plant-based compounds...",
+        affiliateLink: "https://8df2b99jj-xq8m362atlw3vl4j.hop.clickbank.net/?&traffic_source=pinterest"  // Joint Genesis™
+    },
+    "blood-sugar": {
+        title: "🩸 Your Focus: Blood Sugar Balance",
+        text: "Stable blood sugar is crucial...",
+        recommendation: "Consider natural approaches that can help your body...",
+        affiliateLink: "https://ca88ebzkp81hfxdeytplbv3oee.hop.clickbank.net/?&traffic_source=pinterest"  // Gluco6
+    },
+    skin: {
+        title: "✨ Your Focus: Radiant, Youthful Skin",
+        text: "Your skin reflects...",
+        recommendation: "Research shows that certain antioxidants...",
+        affiliateLink: "https://48d1dc99mw1e4t1apeu8u2nn6g.hop.clickbank.net/?&traffic_source=pinterest"  // Neotonics
+    },
+    dental: {
+        title: "🦷 Your Focus: Optimal Oral Health",
+        text: "Oral health is closely connected...",
+        recommendation: "Studies indicate that certain probiotic strains...",
+        affiliateLink: "https://72ba65zdy74l2m3gyaqdwft65l.hop.clickbank.net/?&traffic_source=pinterest"  // ProDentim
+    }
+};
+
+// 2. Modificăm funcția showFinalMessage astfel încât butonul să deschidă link-ul corect:
+function showFinalMessage() {
+    const result = results[selectedCategory];
+    document.querySelector('.email-container').innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+            <h3>🎉 Based on Your Results...</h3>
+            <p>We found something that might help you achieve your health goals faster.</p>
+            <button class="btn" onclick="window.open('${result.affiliateLink}', '_blank')" style="margin: 15px 0; background: linear-gradient(135deg, #28a745, #20c997);">
+                🎯 See Your Personalized Solution
+            </button>
+            <p style="font-size: 0.9em; color: #666;">Discover the science-backed approach that addresses your specific needs</p>
+        </div>
+    `;
+    document.getElementById('retakeBtn').classList.remove('hidden');
+}
+
+        
+        function retakeQuiz() {
+            currentQuestion = 0;
+            answers = {};
+            selectedCategory = '';
+            
+            document.getElementById('questionContainer').classList.remove('hidden');
+            document.getElementById('resultContainer').classList.add('hidden');
+            document.getElementById('retakeBtn').classList.add('hidden');
+            
+            document.getElementById('question').textContent = "What's your main health priority right now?";
+            document.getElementById('options').innerHTML = `
+                <div class="option" data-category="weight">🏃‍♀️ Slim down & lose belly fat</div>
+                <div class="option" data-category="energy">⚡ Boost all-day energy</div>
+                <div class="option" data-category="digestion">🌱 Calm my digestion / microbiome</div>
+                <div class="option" data-category="joints">🦴 Keep joints comfy & flexible</div>
+                <div class="option" data-category="blood-sugar">🩸 Balance blood sugar</div>
+                <div class="option" data-category="skin">✨ Get glowing, younger-looking skin</div>
+                <div class="option" data-category="dental">🦷 Strengthen teeth & gums</div>
+            `;
+            
+            updateProgress();
+        }
+        
+        // Initialize the quiz
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress();
+            
+            // Add click handlers to initial options
+            document.querySelectorAll('.option').forEach(option => {
+                option.onclick = () => selectOption(option);
+            });
+        });
+    </script>
+</body>
+</html>
